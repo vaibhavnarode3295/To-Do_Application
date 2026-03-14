@@ -33,42 +33,10 @@ public class UserController {
     }
 
     @PostMapping("/saveUser")
-    public String saveUser(@ModelAttribute Users user, HttpSession session)
-    {
-        log.info("registration done");
-        String otp = userService.generateOtp();
-        log.info("otp generated");
-        session.setAttribute("otp",otp);
-        session.setAttribute("user",user);
-        log.info("otp is "+otp);
-        userService.sendMail(user.getEmail(), otp);
-        log.info("email is send to the user");
-        return "verify-otp";
+    public String registerUser(@ModelAttribute Users user){
+        userService.saveUser(user);
+        return "redirect:/login?registered";
     }
-
-    @PostMapping("/verify-otp")
-    public String OtpVerify(@RequestParam String otpInput, HttpSession session)
-    {
-        String getOtp = (String) session.getAttribute("otp");
-        Users user= (Users) session.getAttribute("user");
-        System.out.println(getOtp);
-        System.out.println(otpInput);
-
-        if(getOtp.equals(otpInput))
-        {
-            userService.saveUser(user);
-            session.removeAttribute("otp");
-            session.removeAttribute("user");
-            return "redirect:/login?registered";
-        }
-        return "wrong-otp";
-    }
-
-//    @PostMapping("/saveUser")
-//    public String registerUser(@ModelAttribute Users user){
-//        userService.saveUser(user);
-//        return "redirect:/login?registered";
-//    }
 
     @GetMapping("/login")
     public String login()
